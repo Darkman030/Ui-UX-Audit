@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>UX / UI Audit Template</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap');
+  @font-face { font-family: 'Impact'; src: local('Impact'); }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink: #0E0E1A;
+    --red: #E8334A;
+    --blue: #0F2B6B;
+    --purple: #5C2D8C;
+    --teal: #0A6E5A;
+    --mid: #6B6B82;
+    --line: #E2E2EC;
+    --bg: #F7F7FA;
+    --white: #FFFFFF;
+    --crit-bg: #FFF0F2;
+    --crit-text: #C41230;
+    --major-bg: #FFF5E6;
+    --major-text: #9B5E00;
+    --minor-bg: #E8FBF2;
+    --minor-text: #0D7040;
+  }
+
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; }
+
+  /* ---- HEADER ---- */
+  .site-header {
+    background: var(--ink);
+    padding: 28px 48px;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 20px; flex-wrap: wrap;
+    position: sticky; top: 0; z-index: 100;
+    border-bottom: 3px solid var(--red);
+  }
+  .site-header h1 {
+    font-family: 'Impact', 'Arial Narrow', sans-serif; font-size: 1.35rem; font-weight: 400;
+    color: var(--white); letter-spacing: 0.1em; text-transform: uppercase;
+  }
+  .site-header h1 span { color: var(--red); }
+  .header-actions { display: flex; gap: 12px; align-items: center; }
+  .btn {
+    font-family: 'DM Sans', sans-serif; font-size: 0.82rem; font-weight: 600;
+    padding: 9px 20px; border-radius: 6px; cursor: pointer; border: none;
+    letter-spacing: 0.04em; transition: all 0.18s ease;
+  }
+  .btn-ghost { background: transparent; color: var(--white); border: 1.5px solid rgba(255,255,255,0.25); }
+  .btn-ghost:hover { border-color: var(--red); color: var(--red); }
+  .btn-primary { background: var(--red); color: var(--white); }
+  .btn-primary:hover { background: #C0172F; }
+
+  /* ---- LAYOUT ---- */
+  .app { display: grid; grid-template-columns: 260px 1fr; min-height: calc(100vh - 70px); }
+
+  /* ---- SIDEBAR ---- */
+  .sidebar {
+    background: var(--white); border-right: 1px solid var(--line);
+    padding: 32px 0; position: sticky; top: 70px; height: calc(100vh - 70px);
+    overflow-y: auto;
+  }
+  .sidebar-section { padding: 0 24px; margin-bottom: 32px; }
+  .sidebar-label {
+    font-size: 0.65rem; font-weight: 700; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--mid); margin-bottom: 12px;
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 12px; border-radius: 8px; cursor: pointer;
+    font-size: 0.88rem; font-weight: 500; color: var(--mid);
+    transition: all 0.15s; margin-bottom: 2px; text-decoration: none;
+  }
+  .nav-item:hover { background: var(--bg); color: var(--ink); }
+  .nav-item.active { background: var(--ink); color: var(--white); }
+  .nav-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+  /* score mini */
+  .score-mini { margin-top: 24px; }
+  .score-mini-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 7px 12px; font-size: 0.82rem;
+  }
+  .score-mini-row span:last-child { font-weight: 700; color: var(--red); font-family: 'Impact', sans-serif; }
+  .progress-bar { height: 3px; background: var(--line); border-radius: 99px; margin: 0 12px 4px; }
+  .progress-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--red), #FF6B7A); transition: width 0.4s ease; }
+
+  /* ---- MAIN CONTENT ---- */
+  .main { padding: 40px 48px; max-width: 1080px; }
+
+  /* Cover panel */
+  .cover-panel {
+    background: var(--ink); border-radius: 16px; padding: 48px;
+    margin-bottom: 40px; position: relative; overflow: hidden;
+  }
+  .cover-panel::before {
+    content: ''; position: absolute; top: -60px; right: -60px;
+    width: 300px; height: 300px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(232,51,74,0.25), transparent 70%);
+  }
+  .cover-label {
+    font-family: 'Impact', sans-serif; font-size: 0.7rem; font-weight: 400;
+    letter-spacing: 0.2em; text-transform: uppercase; color: var(--red);
+    margin-bottom: 12px;
+  }
+  .cover-title {
+    font-family: 'Impact', sans-serif; font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 400; color: var(--white); line-height: 1.05; margin-bottom: 24px;
+  }
+  .cover-title em { color: var(--red); font-style: normal; }
+  .cover-meta { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; margin-top: 32px; }
+  .meta-field label {
+    font-size: 0.7rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+    color: rgba(255,255,255,0.45); display: block; margin-bottom: 6px;
+  }
+  .meta-field input {
+    background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);
+    color: var(--white); border-radius: 8px; padding: 10px 14px;
+    font-family: 'DM Sans', sans-serif; font-size: 0.9rem; width: 100%;
+    transition: border-color 0.15s;
+  }
+  .meta-field input:focus { outline: none; border-color: var(--red); background: rgba(255,255,255,0.12); }
+  .meta-field input::placeholder { color: rgba(255,255,255,0.3); }
+
+  /* Section panels */
+  .section-panel { background: var(--white); border-radius: 16px; padding: 36px 40px; margin-bottom: 32px; border: 1px solid var(--line); }
+  .section-header { display: flex; align-items: flex-start; gap: 20px; margin-bottom: 28px; padding-bottom: 20px; border-bottom: 1px solid var(--line); }
+  .section-num {
+    font-family: 'Impact', sans-serif; font-size: 2.2rem; font-weight: 400;
+    line-height: 1; min-width: 48px;
+  }
+  .section-info h2 { font-family: 'Impact', sans-serif; font-size: 1.2rem; font-weight: 400; margin-bottom: 6px; }
+  .section-info p { font-size: 0.88rem; color: var(--mid); line-height: 1.6; }
+
+  /* Score row */
+  .score-row {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 24px; flex-wrap: wrap;
+  }
+  .score-label { font-size: 0.82rem; font-weight: 600; color: var(--mid); }
+  .score-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+  .score-btn {
+    width: 36px; height: 36px; border-radius: 8px; border: 1.5px solid var(--line);
+    background: var(--white); font-size: 0.82rem; font-weight: 700;
+    cursor: pointer; transition: all 0.15s; color: var(--mid);
+    font-family: 'Impact', sans-serif;
+  }
+  .score-btn:hover { border-color: var(--ink); color: var(--ink); }
+  .score-btn.active { background: var(--ink); border-color: var(--ink); color: var(--white); }
+  .score-display {
+    font-family: 'Impact', sans-serif; font-size: 1.4rem; font-weight: 400;
+    margin-left: auto; color: var(--red);
+  }
+
+  /* Findings */
+  .findings-table { display: flex; flex-direction: column; gap: 12px; margin-bottom: 0; }
+
+  .finding-card {
+    background: var(--bg); border: 1.5px solid var(--line); border-radius: 12px;
+    padding: 20px; transition: border-color 0.15s;
+  }
+  .finding-card:focus-within { border-color: var(--ink); background: var(--white); }
+
+  .finding-card-top {
+    display: grid; grid-template-columns: 1fr 140px 90px 32px;
+    gap: 12px; align-items: start; margin-bottom: 12px;
+  }
+  .finding-card-bottom {
+    display: grid; grid-template-columns: 1fr;
+  }
+
+  .field-group { display: flex; flex-direction: column; gap: 4px; }
+  .field-label {
+    font-size: 0.68rem; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--mid);
+  }
+
+  .finding-input {
+    border: 1.5px solid var(--line); border-radius: 8px; background: var(--white);
+    font-family: 'DM Sans', sans-serif; font-size: 0.9rem; color: var(--ink);
+    resize: none; width: 100%; min-height: 56px; line-height: 1.55;
+    padding: 10px 12px; transition: border-color 0.15s;
+    overflow: hidden; field-sizing: content;
+  }
+  .finding-input:focus { outline: none; border-color: var(--ink); }
+  .finding-input::placeholder { color: #C0C0D0; }
+  .finding-input.tall { min-height: 72px; }
+
+  .severity-select {
+    border: 1.5px solid var(--line); border-radius: 8px; padding: 10px 12px;
+    font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 600;
+    cursor: pointer; background: var(--white); width: 100%;
+    transition: border-color 0.15s; height: 44px;
+  }
+  .severity-select:focus { outline: none; }
+  .severity-select.critical { background: var(--crit-bg); color: var(--crit-text); border-color: #F5A0AE; }
+  .severity-select.major { background: var(--major-bg); color: var(--major-text); border-color: #FFCC80; }
+  .severity-select.minor { background: var(--minor-bg); color: var(--minor-text); border-color: #7DDFAB; }
+
+  .priority-select {
+    border: 1.5px solid var(--line); border-radius: 8px; padding: 10px 8px;
+    font-family: 'Impact', sans-serif; font-size: 0.85rem; font-weight: 400;
+    cursor: pointer; background: var(--white); width: 100%; height: 44px;
+  }
+  .priority-select:focus { outline: none; }
+
+  .delete-btn {
+    width: 32px; height: 32px; border-radius: 8px; border: 1.5px solid var(--line);
+    background: transparent; cursor: pointer; color: var(--mid);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem; transition: all 0.15s; flex-shrink: 0; margin-top: 2px;
+  }
+  .delete-btn:hover { background: var(--crit-bg); border-color: var(--red); color: var(--red); }
+
+  .add-finding-btn {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 14px 16px; background: var(--bg);
+    border: 1.5px dashed var(--line); border-radius: 12px;
+    cursor: pointer; font-size: 0.875rem; font-weight: 600; color: var(--mid);
+    transition: all 0.15s; width: 100%; font-family: 'DM Sans', sans-serif;
+  }
+  .add-finding-btn:hover { background: #EDEDF5; border-color: var(--ink); color: var(--ink); }
+
+  .notes-field {
+    margin-top: 20px;
+  }
+  .notes-field label {
+    font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--mid); display: block; margin-bottom: 8px;
+  }
+  .notes-field textarea {
+    width: 100%; border: 1.5px solid var(--line); border-radius: 10px; padding: 14px 16px;
+    font-family: 'DM Sans', sans-serif; font-size: 0.875rem; color: var(--ink);
+    resize: vertical; min-height: 80px; background: var(--bg); transition: border-color 0.15s;
+  }
+  .notes-field textarea:focus { outline: none; border-color: var(--ink); background: var(--white); }
+  .notes-field textarea::placeholder { color: #C0C0D0; }
+
+  /* Summary panel */
+  .summary-panel { background: var(--ink); border-radius: 16px; padding: 36px 40px; margin-bottom: 32px; color: var(--white); }
+  .summary-title { font-family: 'Impact', sans-serif; font-size: 1.1rem; font-weight: 400; margin-bottom: 24px; color: var(--white); }
+  .summary-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; margin-bottom: 28px; }
+  .summary-card { background: rgba(255,255,255,0.07); border-radius: 12px; padding: 20px 24px; }
+  .summary-card-label { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.45); margin-bottom: 8px; }
+  .summary-card-score { font-family: 'Impact', sans-serif; font-size: 2.4rem; font-weight: 400; color: var(--white); }
+  .summary-card-score small { font-size: 1rem; opacity: 0.45; }
+  .summary-card-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+
+  .overall-score-ring {
+    display: flex; align-items: center; gap: 24px; background: rgba(255,255,255,0.05);
+    border-radius: 12px; padding: 24px 28px; border: 1px solid rgba(255,255,255,0.1);
+  }
+  .ring-val { font-family: 'Impact', sans-serif; font-size: 3.5rem; font-weight: 400; color: var(--red); line-height: 1; }
+  .ring-val small { font-size: 1.2rem; color: rgba(255,255,255,0.3); }
+  .ring-info h3 { font-family: 'Impact', sans-serif; font-size: 1rem; font-weight: 400; color: var(--white); margin-bottom: 6px; }
+  .ring-info p { font-size: 0.85rem; color: rgba(255,255,255,0.45); line-height: 1.5; }
+
+  .severity-counts { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 20px; }
+  .sev-badge {
+    padding: 6px 14px; border-radius: 99px; font-size: 0.8rem; font-weight: 700;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .sev-badge.crit { background: var(--crit-bg); color: var(--crit-text); }
+  .sev-badge.major { background: var(--major-bg); color: var(--major-text); }
+  .sev-badge.minor { background: var(--minor-bg); color: var(--minor-text); }
+
+  /* toast */
+  .toast {
+    position: fixed; bottom: 28px; right: 28px; z-index: 9999;
+    background: var(--ink); color: var(--white); border-left: 4px solid var(--red);
+    padding: 14px 22px; border-radius: 10px; font-size: 0.875rem; font-weight: 500;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.18); opacity: 0; transform: translateY(12px);
+    transition: all 0.22s ease; pointer-events: none;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+
+  /* print */
+  @media print {
+    @page { margin: 14mm 14mm; size: A4; }
+
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+
+    .site-header, .sidebar, .header-actions, .add-finding-btn, .delete-btn,
+    .cover-panel::before { display: none !important; }
+
+    body { background: #fff !important; font-size: 10pt; }
+    .app { display: block; }
+    .main { padding: 0; max-width: 100%; }
+
+    /* ---- COVER ---- */
+    .cover-panel {
+      background: #0E0E1A !important; border-radius: 10px;
+      padding: 28px 32px; margin-bottom: 20px;
+      break-inside: avoid; page-break-inside: avoid;
+    }
+    .cover-label { font-size: 7pt; letter-spacing: 0.18em; }
+    .cover-title { font-size: 2rem; margin-bottom: 16px; }
+    .cover-meta { grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 16px; }
+    .meta-field label { font-size: 7pt; margin-bottom: 3px; }
+    .meta-field input {
+      border: none !important; background: transparent !important;
+      color: #fff !important; padding: 0; font-size: 9pt; width: 100%;
+    }
+
+    /* ---- SECTIONS ---- */
+    .section-panel {
+      border: 1px solid #E2E2EC !important; border-radius: 10px;
+      padding: 20px 24px; margin-bottom: 16px;
+      break-inside: avoid; page-break-inside: avoid;
+    }
+    .section-header { margin-bottom: 12px; padding-bottom: 12px; gap: 14px; }
+    .section-num { font-size: 1.6rem; min-width: 36px; }
+    .section-info h2 { font-size: 11pt; margin-bottom: 3px; }
+    .section-info p { font-size: 8.5pt; }
+
+    /* Score row */
+    .score-btns { display: none !important; }
+    .score-row { margin-bottom: 12px; gap: 8px; }
+    .score-label { font-size: 8pt; }
+    .score-display { font-size: 1rem; margin-left: 0; }
+
+    /* ---- FINDING CARDS ---- */
+    .findings-table { gap: 6px; }
+    .finding-card {
+      background: #F7F7FA !important; border: 1px solid #E2E2EC !important;
+      border-radius: 8px; padding: 12px 14px;
+      break-inside: avoid; page-break-inside: avoid;
+    }
+    .finding-card-top {
+      grid-template-columns: 1fr auto auto;
+      gap: 12px; margin-bottom: 8px; align-items: start;
+    }
+    .finding-card-top > *:last-child { display: none !important; }
+
+    /* Replace dropdowns with plain text badges */
+    .severity-select, .priority-select {
+      -webkit-appearance: none; appearance: none;
+      border-radius: 4px; padding: 2px 8px !important;
+      font-size: 8pt; height: auto !important; min-height: 0 !important;
+      width: auto !important; pointer-events: none;
+    }
+    .severity-select.critical { background: #FFF0F2 !important; color: #C41230 !important; border: 1px solid #F5A0AE !important; }
+    .severity-select.major    { background: #FFF5E6 !important; color: #9B5E00 !important; border: 1px solid #FFCC80 !important; }
+    .severity-select.minor    { background: #E8FBF2 !important; color: #0D7040 !important; border: 1px solid #7DDFAB !important; }
+    .priority-select { background: #F0F0F8 !important; color: #0E0E1A !important; border: 1px solid #C0C0D0 !important; }
+
+    .finding-input {
+      border: none !important; background: transparent !important;
+      padding: 0 !important; font-size: 9pt; height: auto !important;
+      min-height: 0 !important; resize: none;
+    }
+    .field-label { font-size: 7pt; margin-bottom: 2px; }
+    .finding-card-bottom { margin-top: 0; }
+
+    /* Notes */
+    .notes-field { margin-top: 10px; }
+    .notes-field label { font-size: 7pt; margin-bottom: 3px; }
+    .notes-field textarea {
+      border: none !important; background: transparent !important;
+      padding: 0; font-size: 9pt; min-height: 0 !important; resize: none;
+    }
+
+    /* ---- SUMMARY ---- */
+    .summary-panel {
+      background: #0E0E1A !important; border-radius: 10px;
+      padding: 24px 28px; break-inside: avoid; page-break-inside: avoid;
+      margin-top: 16px;
+    }
+    .summary-title { font-size: 11pt; margin-bottom: 16px; }
+    .summary-grid { grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 16px; }
+    .summary-card { background: rgba(255,255,255,0.08) !important; border-radius: 8px; padding: 12px 14px; }
+    .summary-card-label { font-size: 7pt; }
+    .summary-card-score { font-size: 1.8rem; }
+    .overall-score-ring { background: rgba(255,255,255,0.05) !important; padding: 16px 20px; gap: 16px; }
+    .ring-val { font-size: 2.4rem; }
+    .ring-info h3 { font-size: 10pt; }
+    .ring-info p { font-size: 8.5pt; }
+    .severity-counts { margin-top: 10px; gap: 8px; }
+    .sev-badge { font-size: 7.5pt; padding: 3px 10px; }
+    #exec-summary {
+      border: none !important; background: transparent !important;
+      color: rgba(255,255,255,0.75) !important; font-size: 9pt; padding: 0; resize: none;
+    }
+    .notes-field[style] label { color: rgba(255,255,255,0.45) !important; }
+  }
+
+  @media (max-width: 900px) {
+    .app { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
+    .main { padding: 24px 20px; }
+    .finding-card-top { grid-template-columns: 1fr 1fr; }
+    .finding-card-top > *:nth-child(3),
+    .finding-card-top > *:nth-child(4) { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <h1>UX / UI <span>Audit</span> Template</h1>
+  <div class="header-actions">
+    <button class="btn btn-ghost" onclick="window.print()">Print / Export PDF</button>
+    <button class="btn btn-ghost" onclick="triggerImport()">Import JSON</button>
+    <input type="file" id="import-input" accept=".json" style="display:none" onchange="importData(event)" />
+    <button class="btn btn-ghost" onclick="exportCSV()">Export CSV</button>
+    <button class="btn btn-primary" onclick="saveData()">Save JSON</button>
+  </div>
+</header>
+
+<div class="app">
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Navigation</div>
+      <a class="nav-item active" href="#cover" onclick="setActive(this)">
+        <span class="nav-dot" style="background:#6B6B82"></span> Audit Details
+      </a>
+      <a class="nav-item" href="#s01" onclick="setActive(this)">
+        <span class="nav-dot" style="background:#E8334A"></span> Heuristics & Usability
+      </a>
+      <a class="nav-item" href="#s02" onclick="setActive(this)">
+        <span class="nav-dot" style="background:#0F2B6B"></span> Visual Design & Brand
+      </a>
+      <a class="nav-item" href="#s03" onclick="setActive(this)">
+        <span class="nav-dot" style="background:#5C2D8C"></span> Conversion & CRO
+      </a>
+      <a class="nav-item" href="#s04" onclick="setActive(this)">
+        <span class="nav-dot" style="background:#0A6E5A"></span> Accessibility (WCAG)
+      </a>
+      <a class="nav-item" href="#summary" onclick="setActive(this)">
+        <span class="nav-dot" style="background:#E8334A"></span> Score Summary
+      </a>
+    </div>
+
+    <div class="sidebar-section score-mini">
+      <div class="sidebar-label">Section Scores</div>
+      <div id="sidebar-scores"></div>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- COVER -->
+    <div class="cover-panel" id="cover">
+      <div class="cover-label">Agency UX Review Document</div>
+      <div class="cover-title">UX / UI <em>Audit</em><br>Report</div>
+      <div class="cover-meta">
+        <div class="meta-field"><label>Client / Product</label><input type="text" id="meta-client" placeholder="e.g. Acme Corp — Homepage" /></div>
+        <div class="meta-field"><label>URL / Scope</label><input type="text" id="meta-url" placeholder="https://example.com" /></div>
+        <div class="meta-field"><label>Auditor</label><input type="text" id="meta-auditor" placeholder="Your name" /></div>
+        <div class="meta-field"><label>Date</label><input type="date" id="meta-date" /></div>
+        <div class="meta-field"><label>Version</label><input type="text" id="meta-version" placeholder="v1.0" /></div>
+        <div class="meta-field"><label>Status</label><input type="text" id="meta-status" placeholder="Draft / Final" /></div>
+      </div>
+    </div>
+
+    <!-- SECTIONS -->
+    <div id="sections-container"></div>
+
+    <!-- SUMMARY -->
+    <div class="summary-panel" id="summary">
+      <div class="summary-title">Audit Score Summary</div>
+      <div class="summary-grid" id="summary-cards"></div>
+      <div class="overall-score-ring">
+        <div class="ring-val" id="overall-score">—<small>/10</small></div>
+        <div class="ring-info">
+          <h3>Overall UX Score</h3>
+          <p id="overall-label">Fill in section scores above to see your overall rating.</p>
+          <div class="severity-counts" id="sev-counts"></div>
+        </div>
+      </div>
+      <div class="notes-field" style="margin-top:24px;">
+        <label>Executive Summary / Key Recommendations</label>
+        <textarea id="exec-summary" rows="5" placeholder="Summarise the key findings, priorities, and recommended next steps for the client..."></textarea>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SECTIONS = [
+  {
+    id: 's01', num: '01', color: '#E8334A', dotColor: '#E8334A',
+    title: 'Heuristics & Usability',
+    desc: 'Evaluate the interface against Nielsen\'s 10 usability heuristics. Assess navigation clarity, system feedback, error prevention, cognitive load, and overall ease of use.',
+  },
+  {
+    id: 's02', num: '02', color: '#0F2B6B', dotColor: '#0F2B6B',
+    title: 'Visual Design & Brand',
+    desc: 'Review visual hierarchy, typography, colour usage, spacing, imagery quality, and brand consistency across all screens and states.',
+  },
+  {
+    id: 's03', num: '03', color: '#5C2D8C', dotColor: '#5C2D8C',
+    title: 'Conversion & CRO',
+    desc: 'Identify friction in key user flows, CTA clarity, form UX, trust signals, and opportunities to improve conversion rate.',
+  },
+  {
+    id: 's04', num: '04', color: '#0A6E5A', dotColor: '#0A6E5A',
+    title: 'Accessibility (WCAG)',
+    desc: 'Assess WCAG 2.1 AA conformance: colour contrast, keyboard navigation, screen reader support, alt text, focus indicators, and semantic markup.',
+  },
+];
+
+const state = { sections: {}, scores: {} };
+
+SECTIONS.forEach(s => {
+  state.sections[s.id] = [emptyFinding(), emptyFinding(), emptyFinding()];
+  state.scores[s.id] = 0;
+});
+
+function emptyFinding() {
+  return { finding: '', desc: '', severity: 'major', rec: '', priority: 'P1' };
+}
+
+function buildSections() {
+  const container = document.getElementById('sections-container');
+  SECTIONS.forEach(s => {
+    const panel = document.createElement('div');
+    panel.className = 'section-panel';
+    panel.id = s.id;
+    panel.innerHTML = `
+      <div class="section-header">
+        <div class="section-num" style="color:${s.color}">${s.num}</div>
+        <div class="section-info">
+          <h2>${s.title}</h2>
+          <p>${s.desc}</p>
+        </div>
+      </div>
+      <div class="score-row">
+        <span class="score-label">Section Score:</span>
+        <div class="score-btns" id="score-btns-${s.id}">
+          ${[1,2,3,4,5,6,7,8,9,10].map(n => `<button class="score-btn" data-sec="${s.id}" data-val="${n}" onclick="setScore('${s.id}',${n})">${n}</button>`).join('')}
+        </div>
+        <span class="score-display" id="score-display-${s.id}">—/10</span>
+      </div>
+      <div class="findings-table">
+        <div id="rows-${s.id}"></div>
+        <button class="add-finding-btn" onclick="addFinding('${s.id}')">+ Add Finding</button>
+      </div>
+      <div class="notes-field">
+        <label>Section Notes</label>
+        <textarea id="notes-${s.id}" placeholder="Add qualitative observations, screenshot references, or additional context..." oninput="autoSave()"></textarea>
+      </div>
+    `;
+    container.appendChild(panel);
+    renderRows(s.id);
+  });
+  updateSummary();
+}
+
+function renderRows(sid) {
+  const container = document.getElementById(`rows-${sid}`);
+  container.innerHTML = '';
+  state.sections[sid].forEach((f, i) => {
+    const card = document.createElement('div');
+    card.className = 'finding-card';
+    card.innerHTML = `
+      <div class="finding-card-top">
+        <div class="field-group">
+          <span class="field-label">Finding / Issue</span>
+          <textarea class="finding-input" placeholder="e.g. No error state on form fields" oninput="updateField('${sid}',${i},'finding',this.value);autoSave()">${f.finding}</textarea>
+        </div>
+        <div class="field-group">
+          <span class="field-label">Severity</span>
+          <select class="severity-select" onchange="updateField('${sid}',${i},'severity',this.value);styleSev(this);autoSave()">
+            <option value="critical" ${f.severity==='critical'?'selected':''}>Critical</option>
+            <option value="major" ${f.severity==='major'?'selected':''}>Major</option>
+            <option value="minor" ${f.severity==='minor'?'selected':''}>Minor</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <span class="field-label">Priority</span>
+          <select class="priority-select" onchange="updateField('${sid}',${i},'priority',this.value);autoSave()">
+            <option value="P0" ${f.priority==='P0'?'selected':''}>P0</option>
+            <option value="P1" ${f.priority==='P1'?'selected':''}>P1</option>
+            <option value="P2" ${f.priority==='P2'?'selected':''}>P2</option>
+          </select>
+        </div>
+        <button class="delete-btn" onclick="removeFinding('${sid}',${i})" title="Remove">×</button>
+      </div>
+      <div class="finding-card-bottom">
+        <div class="field-group">
+          <span class="field-label">Description & Recommendation</span>
+          <textarea class="finding-input tall" placeholder="Describe what you observed and the recommended fix..." oninput="updateField('${sid}',${i},'desc',this.value);autoSave()">${f.desc || f.rec}</textarea>
+        </div>
+      </div>
+    `;
+    container.appendChild(card);
+    const sel = card.querySelector('.severity-select');
+    if (sel) styleSev(sel);
+    card.querySelectorAll('.finding-input').forEach(el => {
+      autoResize(el);
+      el.addEventListener('input', () => autoResize(el));
+    });
+  });
+  updateSevCount();
+}
+
+function styleSev(sel) {
+  sel.className = 'severity-select ' + sel.value;
+}
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = el.scrollHeight + 'px';
+}
+
+function initAutoResize() {
+  document.querySelectorAll('.finding-input').forEach(el => {
+    autoResize(el);
+    el.addEventListener('input', () => autoResize(el));
+  });
+}
+// Also patch notes textareas
+function initNotesResize() {
+  document.querySelectorAll('.notes-field textarea').forEach(el => {
+    el.style.overflow = 'hidden';
+    const grow = () => { el.style.height = 'auto'; el.style.height = el.scrollHeight + 'px'; };
+    grow();
+    el.addEventListener('input', grow);
+  });
+}
+
+function updateField(sid, i, field, val) {
+  state.sections[sid][i][field] = val;
+}
+
+function addFinding(sid) {
+  state.sections[sid].push(emptyFinding());
+  renderRows(sid);
+}
+
+function removeFinding(sid, i) {
+  if (state.sections[sid].length <= 1) return;
+  state.sections[sid].splice(i, 1);
+  renderRows(sid);
+}
+
+function setScore(sid, val) {
+  state.scores[sid] = val;
+  document.querySelectorAll(`#score-btns-${sid} .score-btn`).forEach(b => {
+    b.classList.toggle('active', parseInt(b.dataset.val) === val);
+  });
+  document.getElementById(`score-display-${sid}`).textContent = `${val}/10`;
+  updateSummary();
+  updateSidebarScores();
+  autoSave();
+}
+
+function updateSummary() {
+  const cards = document.getElementById('summary-cards');
+  cards.innerHTML = '';
+  let total = 0, count = 0;
+  SECTIONS.forEach(s => {
+    const sc = state.scores[s.id] || 0;
+    if (sc > 0) { total += sc; count++; }
+    const card = document.createElement('div');
+    card.className = 'summary-card';
+    card.innerHTML = `
+      <div class="summary-card-label"><span class="summary-card-dot" style="background:${s.color}"></span>${s.title}</div>
+      <div class="summary-card-score">${sc || '—'}<small>${sc ? '/10' : ''}</small></div>
+    `;
+    cards.appendChild(card);
+  });
+
+  const avg = count > 0 ? (total / count).toFixed(1) : '—';
+  document.getElementById('overall-score').innerHTML = `${avg}<small>/10</small>`;
+
+  const labels = { '9': 'Excellent — polish & ship', '7': 'Good — minor improvements needed', '5': 'Fair — significant work required', '0': 'Poor — major redesign recommended' };
+  const label = avg === '—' ? 'Fill in section scores to see rating.' :
+    avg >= 9 ? labels['9'] : avg >= 7 ? labels['7'] : avg >= 5 ? labels['5'] : labels['0'];
+  document.getElementById('overall-label').textContent = label;
+  updateSevCount();
+}
+
+function updateSevCount() {
+  let crit = 0, major = 0, minor = 0;
+  Object.values(state.sections).forEach(rows => {
+    rows.forEach(r => {
+      if (!r.finding.trim()) return; // skip empty rows
+      if (r.severity === 'critical') crit++;
+      else if (r.severity === 'major') major++;
+      else if (r.severity === 'minor') minor++;
+    });
+  });
+  document.getElementById('sev-counts').innerHTML = `
+    <span class="sev-badge crit">${crit} Critical</span>
+    <span class="sev-badge major">${major} Major</span>
+    <span class="sev-badge minor">${minor} Minor</span>
+  `;
+}
+
+function updateSidebarScores() {
+  const el = document.getElementById('sidebar-scores');
+  el.innerHTML = SECTIONS.map(s => {
+    const sc = state.scores[s.id] || 0;
+    const pct = sc * 10;
+    return `
+      <div class="score-mini-row"><span style="color:${s.color};font-size:0.82rem">${s.num} ${s.title.split(' ')[0]}</span><span>${sc || '—'}</span></div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+    `;
+  }).join('');
+}
+
+function setActive(el) {
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  el.classList.add('active');
+}
+
+let _saveTimer;
+function autoSave() {
+  clearTimeout(_saveTimer);
+  _saveTimer = setTimeout(() => {
+    try { localStorage.setItem('ux_audit_state', JSON.stringify(collectState())); } catch(e) {}
+  }, 400);
+}
+
+function collectState() {
+  const meta = {};
+  ['client','url','auditor','date','version','status'].forEach(k => {
+    const el = document.getElementById(`meta-${k}`);
+    if (el) meta[k] = el.value;
+  });
+  const notes = {};
+  SECTIONS.forEach(s => {
+    const el = document.getElementById(`notes-${s.id}`);
+    if (el) notes[s.id] = el.value;
+  });
+  return { meta, notes, sections: state.sections, scores: state.scores, exec: document.getElementById('exec-summary')?.value || '' };
+}
+
+function loadState(saved) {
+  if (!saved) return;
+  if (saved.meta) Object.entries(saved.meta).forEach(([k,v]) => { const el = document.getElementById(`meta-${k}`); if(el) el.value = v; });
+  if (saved.sections) Object.entries(saved.sections).forEach(([sid, rows]) => { if(state.sections[sid] !== undefined) state.sections[sid] = rows; });
+  if (saved.scores) Object.entries(saved.scores).forEach(([sid, val]) => { if(val) setScore(sid, val); });
+  if (saved.notes) Object.entries(saved.notes).forEach(([sid, val]) => { const el = document.getElementById(`notes-${sid}`); if(el) el.value = val; });
+  if (saved.exec) { const el = document.getElementById('exec-summary'); if(el) el.value = saved.exec; }
+  SECTIONS.forEach(s => renderRows(s.id));
+}
+
+function saveData() {
+  const data = JSON.stringify(collectState(), null, 2);
+  const blob = new Blob([data], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'ux_audit.json';
+  a.click();
+  showToast('Audit saved as ux_audit.json');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+function exportCSV() {
+  const esc = v => '"' + String(v || '').replace(/"/g, '""') + '"';
+  const meta = collectState().meta;
+  const rows = [['Section', 'Finding / Issue', 'Description & Recommendation', 'Severity', 'Priority', 'Client', 'Date']];
+  SECTIONS.forEach(s => {
+    state.sections[s.id].forEach(f => {
+      if (!f.finding.trim()) return;
+      rows.push([s.title, f.finding, f.desc || f.rec, f.severity, f.priority, meta.client || '', meta.date || ''].map(esc));
+    });
+  });
+  const csv = rows.map(r => r.join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'ux_audit_findings.csv';
+  a.click();
+  showToast('Findings exported as CSV');
+}
+
+function triggerImport() {
+  document.getElementById('import-input').click();
+}
+
+function importData(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const parsed = JSON.parse(ev.target.result);
+      loadState(parsed);
+      autoSave();
+      showToast('Audit imported successfully');
+    } catch {
+      showToast('Error: invalid JSON file');
+    }
+    e.target.value = '';
+  };
+  reader.readAsText(file);
+}
+
+// Init
+buildSections();
+updateSidebarScores();
+initNotesResize();
+
+// Set today's date
+document.getElementById('meta-date').value = new Date().toISOString().split('T')[0];
+
+// Load from localStorage
+try {
+  const saved = localStorage.getItem('ux_audit_state');
+  if (saved) { loadState(JSON.parse(saved)); initNotesResize(); }
+} catch(e) {}
+</script>
+</body>
+</html>
